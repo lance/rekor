@@ -51,6 +51,7 @@ redhat_files_msg=":open_file_folder: update Red Hat specific files"
 robot_trigger_msg=":robot: triggering CI on branch '${redhat_ref}' after synching from upstream/${upstream_ref}"
 
 # Reset release-next to upstream main or <git-ref>.
+echo "Fetching upstream changes on ${upstream_ref}..."
 git fetch upstream $upstream_ref
 if [[ "$upstream_ref" == "main" ]]; then
   git checkout upstream/main -B ${redhat_ref}
@@ -59,6 +60,7 @@ else
 fi
 
 # Update redhat's main and take all needed files from there.
+echo "Applying midstream patches from ${midstream_ref}..."
 git fetch origin $midstream_ref
 git checkout origin/$midstream_ref $custom_files
 
@@ -67,11 +69,13 @@ if [[ -d redhat/patches ]]; then
   git apply redhat/patches/*
 fi
 
+echo "Committing changes..."
 git add . # Adds applied patches
 git add $custom_files # Adds custom files
 git commit -m "${redhat_files_msg}"
 
 # Push the release-next branch
+echo "Pushing changes..."
 git push -f origin "${redhat_ref}"
 
 # Trigger CI

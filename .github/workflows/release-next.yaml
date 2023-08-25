@@ -1,4 +1,4 @@
-name: GH Actions Cron Schedule
+name: Sync release-next
 on:
   workflow_dispatch:
   schedule:
@@ -9,8 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Configure upstream
-        run: git remote add upstream git@github.com:sigstore/rekor.git
       - name: Check for existing pull request
         run: |
           openPRs="$(gh pr list --state open -H release-next-ci --json number | jq -r '.[].number' | wc -l)"
@@ -20,6 +18,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Run update script
         run: |
+          git remote add upstream https://github.com/sigstore/rekor.git
+          echo "Running sync script"
           ./redhat/release/update-to-head.sh
         if: ${{ env.NUM_OPEN_PRS == 0 }}
         env:

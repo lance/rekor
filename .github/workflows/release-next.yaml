@@ -18,6 +18,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Run update script
         run: |
+          git config --global user.email "lball@redhat.com"
+          git config --global user.name "Rekor CI"
           git remote add upstream https://github.com/sigstore/rekor.git
           echo "Running sync script"
           ./redhat/release/update-to-head.sh
